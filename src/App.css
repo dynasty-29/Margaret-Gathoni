@@ -1,0 +1,214 @@
+.app{
+  background-color: rgb(62, 59, 59);
+  margin: 100px;
+  padding: 60px;
+  width: 100%;
+  max-width: 1200px;
+  align-items: center;
+  justify-content: center;
+}
+/*================ Nav Section =========================*/
+.navbar{
+  background-color: rgb(47, 67, 67);
+  padding: 40px;
+  border-radius: 20px;
+  justify-content: space-between;
+  gap: 30px;
+}
+.nav-list {
+  display: flex;
+  justify-content: flex-end; 
+  gap: 24px; 
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  color: rgb(4, 107, 113);
+  font-size: 24px;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-item:hover {
+  color: #f39c12; 
+}
+/*================ Footer Section =========================*/
+.footer{
+  background-color: cadetblue;
+  margin-bottom: 0;
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.footer-list {
+  display: flex;
+  justify-content: center; 
+  gap: 24px; 
+  list-style: none;
+}
+
+.footer-item {
+  color: rgb(4, 107, 113);
+  font-size: 24px;
+  transition: color 0.3s ease-in-out;
+  display: flex;            
+  align-items: center;      
+  justify-content: center;
+}
+
+.footer-item:hover {
+  color: #ca08ec; 
+}
+
+/*=========================== About Section  ===============================*/
+.about-me{
+  background-color: rgb(13, 38, 38);
+  padding: 40px;
+  margin: 30px;
+}
+.hire-me{
+  background-color: rgb(5, 39, 102);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+/*=========================== Skills Section  ===============================*/
+.skills-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 90%;
+}
+
+.skills-section {
+  width: 60%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.category-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  color: white;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.skill {
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.skill-name {
+  font-size: 16px;
+  color: white;
+}
+
+.skill-percentage {
+  font-size: 14px;
+  font-weight: bold;
+  color: #f39c12;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #f39c12;
+  transition: width 0.5s ease-in-out;
+}
+
+
+
+/*===========================  ===============================*/
+
+/*===========================  ===============================*/
+
+/*===========================  ===============================*/
+
+/*===========================  ===============================*/
+
+/*=========================== Responsive Design - Adjustments for smaller screens ===============================*/
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 15px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .about-me, .hire-me, .skills-section {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  .skills-container {
+    padding: 15px;
+  }
+
+  .skills-section {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    padding: 10px;
+  }
+
+  .nav-item {
+    font-size: 16px;
+  }
+
+  .footer-item {
+    font-size: 14px;
+  }
+
+  .category-title {
+    font-size: 18px;
+  }
+
+  .skills-section {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .app {
+    margin: 10px;
+    padding: 10px;
+  }
+}
