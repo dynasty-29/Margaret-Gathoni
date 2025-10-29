@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/Margaret-Gathoni/static/css/main.52dbb972.css",
+    "main.js": "/Margaret-Gathoni/static/js/main.75618121.js",
+    "static/js/453.1407b060.chunk.js": "/Margaret-Gathoni/static/js/453.1407b060.chunk.js",
+    "static/media/waves.gif": "/Margaret-Gathoni/static/media/waves.9193863b6e433772e764.gif",
+    "static/media/header-img.png": "/Margaret-Gathoni/static/media/header-img.746c645f22138e294a96.png",
+    "index.html": "/Margaret-Gathoni/index.html",
+    "main.52dbb972.css.map": "/Margaret-Gathoni/static/css/main.52dbb972.css.map",
+    "main.75618121.js.map": "/Margaret-Gathoni/static/js/main.75618121.js.map",
+    "453.1407b060.chunk.js.map": "/Margaret-Gathoni/static/js/453.1407b060.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.52dbb972.css",
+    "static/js/main.75618121.js"
+  ]
+}
