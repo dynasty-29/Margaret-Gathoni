@@ -1,44 +1,48 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
-const Navbar = ({ scrollToSlide, slides, currentSlide }) => {
+const Navbar = ({ slides }) => {
+  const location = useLocation();
+
   return (
     <nav
       id="main-nav"
-      className="text-white py-4 fixed top-0 left-0 right-0 z-10 flex justify-between px-6"
-      style={{ backgroundColor: "transparent" }} // Transparent background for the navbar
+      className="text-white py-4 fixed top-0 left-32 right-0 z-50 flex justify-between items-center px-6 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm"
     >
       {/* Website title */}
-      <h1 className="text-white font-bold text-2xl">
-        <span className="text-neutral-800">Margaret</span> Gathoni
-      </h1>
+      <Link to="/" className="font-bold text-2xl hover:opacity-80 transition-opacity cursor-pointer">
+        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          Margaret
+        </span>{" "}
+        <span className="text-gray-800">Gathoni</span>
+      </Link>
 
       {/* Navigation links */}
-      <ul className="flex justify-between space-x-4">
+      <ul className="hidden md:flex justify-center space-x-6">
         {slides.map((slide, index) => (
           <li key={index}>
-            <a
-              href="#"
-              onClick={() => scrollToSlide(index)} // Call scrollToSlide with the index of the clicked slide
+            <Link
+              to={slide.path}
               className={`${
-                currentSlide === index ? "text-white" : "text-neutral-200" // Highlight current slide
-              } hover:text-white transition-colors duration-300`} // Transition effect on hover
+                location.pathname === slide.path
+                  ? "text-indigo-600 font-semibold"
+                  : "text-gray-600"
+              } hover:text-indigo-600 transition-colors duration-300 text-sm cursor-pointer px-3 py-2 rounded-lg hover:bg-indigo-50`}
             >
               {slide.name}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
 
       {/* Download Resume button */}
-      <button>
-        <a
-          href="/Resume.pdf"
-          download="Resume.pdf" // Set up file download
-          className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300" // Button styles
-        >
-          Download Resume
-        </a>
-      </button>
+      <a
+        href="/Resume.pdf"
+        download="Resume.pdf"
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 text-sm font-semibold cursor-pointer"
+      >
+        Download Resume
+      </a>
     </nav>
   );
 };

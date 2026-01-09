@@ -1,85 +1,114 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Introduction from "./components/Introduction";
 import Skills from "./components/Skills";
 import Experience from "./components/Experience";
 import Projects from "./components/Projects";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
-const slides = [
-    { component: <Introduction />, name: "Introduction", color: "rgb(74 222 128)" },
-    { component: <Skills />, name: "Skills", color: "rgb(232 121 249)" },
-    { component: <Experience />, name: "Experience", color: "rgb(96 165 250)" },
-    { component: <Projects />, name: "Projects", color: "rgb(248 113 113)" },
+const sections = [
+    { component: <Introduction />, name: "Introduction", color: "from-indigo-50 via-white to-cyan-50" },
+    { component: <Skills />, name: "Skills", color: "from-purple-50 via-white to-pink-50" },
+    { component: <Experience />, name: "Experience", color: "from-blue-50 via-white to-indigo-50" },
+    { component: <Projects />, name: "Projects", color: "from-cyan-50 via-white to-blue-50" },
 ];
 
 const Home = () => {
-    const containerRef = useRef(null);
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const [currentSection, setCurrentSection] = useState(0);
 
-    const scrollToSlide = (index) => {
-        containerRef.current.scrollTo({
-            left: index * window.innerWidth,
-            behavior: "smooth",
-        });
-        setCurrentSlide(index);
-    };
-
-    const handleScroll = (event) => {
-        if (event.deltaY > 0 && currentSlide < slides.length - 1) {
-            scrollToSlide(currentSlide + 1);
-        } else if (event.deltaY < 0 && currentSlide > 0) {
-            scrollToSlide(currentSlide - 1);
+    const scrollToSection = (index) => {
+        const sectionId = `section-${index}`;
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+            setCurrentSection(index);
         }
     };
 
     useEffect(() => {
-        const container = containerRef.current;
-        container.addEventListener("wheel", handleScroll);
-        return () => container.removeEventListener("wheel", handleScroll);
-    }, [currentSlide]);
+        const handleScroll = () => {
+            const scrollPosition = window.scrollY + 200;
+            
+            sections.forEach((_, index) => {
+                const element = document.getElementById(`section-${index}`);
+                if (element) {
+                    const { offsetTop, offsetHeight } = element;
+                    if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                        setCurrentSection(index);
+                    }
+                }
+            });
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        handleScroll();
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
         <div className="relative">
             <Navbar
-                scrollToSlide={scrollToSlide}
-                slides={slides}
-                currentSlide={currentSlide}
+                scrollToSlide={scrollToSection}
+                slides={sections}
+                currentSlide={currentSection}
             />
 
-            {/* FIX: Allow vertical scroll for inner content */}
-            <div
-                ref={containerRef}
-                className="flex overflow-x-hidden overflow-y-auto w-full h-screen snap-x snap-mandatory"
-            >
-                {slides.map((slide, index) => (
-                    <div
-                        key={index}
-                        className="flex items-center justify-center relative w-screen h-screen flex-shrink-0 snap-center"
-                        style={{ backgroundColor: slide.color }}
-                    >
-                        <div className="overflow-y-auto w-full h-full">
-                            {slide.component}
-                        </div>
+            {/* Left Sidebar Navigation */}
+            <div className="fixed left-0 top-0 h-screen w-32 bg-gray-400 backdrop-blur-md border-r border-gray-200 z-50 flex flex-col items-center justify-center shadow-lg">
+                <div className="space-y-6">
+                    {sections.map((section, index) => (
+                        <button
+                            key={index}
+                            onClick={() => scrollToSection(index)}
+                            className="group relative w-full flex items-center justify-center"
+                        >
+                            <div
+                                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                                    currentSection === index
+                                        ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg scale-105"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                }`}
+                            >
+                                {section.name}
+                            </div>
+                            {currentSection === index && (
+                                <div className="absolute -left-4 w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-r-full" />
+                            )}
+                        </button>
+                    ))}
+                </div>
 
-                        {/* Bottom Dots */}
-                        <div className="absolute bottom-2 w-full flex justify-center text-white">
-                            Scroll to view my skills, experience and projects
-                            {slides.map((_, dotIndex) => (
-                                <div key={dotIndex} className="relative group mx-1">
-                                    <span
-                                        className={`h-2.5 w-2.5 rounded-full inline-block cursor-pointer ${dotIndex === currentSlide ? "bg-white" : "bg-gray-500"
-                                            }`}
-                                        onClick={() => scrollToSlide(dotIndex)}
-                                    ></span>
-                                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        {slides[dotIndex].name}
-                                    </div>
-                                </div>
-                            ))}
+                <div className="absolute bottom-8 flex flex-col items-center gap-2">
+                    {sections.map((_, index) => (
+                        <div
+                            key={index}
+                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                currentSection === index
+                                    ? "bg-indigo-500 h-8"
+                                    : "bg-gray-300"
+                            }`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Vertical scrolling sections with padding for footer */}
+            <div className="ml-32 pb-64">
+                {sections.map((section, index) => (
+                    <section
+                        key={index}
+                        id={`section-${index}`}
+                        className={`w-full min-h-screen bg-gradient-to-br ${section.color} flex items-center justify-center`}
+                    >
+                        <div className="w-full">
+                            {section.component}
                         </div>
-                    </div>
+                    </section>
                 ))}
             </div>
+
+            {/* Fixed Footer */}
+            <Footer scrollToSection={scrollToSection} sections={sections} />
         </div>
     );
 };
