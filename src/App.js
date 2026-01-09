@@ -37,7 +37,7 @@ function App() {
             ))}
           </div>
         </div>
-
+        <Introduction />
         {/* Main Content */}
         <div className="ml-32">
           <Routes>
