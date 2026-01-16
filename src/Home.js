@@ -5,16 +5,18 @@ import Experience from "./components/Experience";
 import Projects from "./components/Projects";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { motion } from "framer-motion";
 
 const sections = [
-    { component: <Introduction />, name: "Introduction", color: "from-indigo-50 via-white to-cyan-50" },
-    { component: <Skills />, name: "Skills", color: "from-purple-50 via-white to-pink-50" },
-    { component: <Experience />, name: "Experience", color: "from-blue-50 via-white to-indigo-50" },
-    { component: <Projects />, name: "Projects", color: "from-cyan-50 via-white to-blue-50" },
+    { component: <Introduction />, name: "Introduction", icon: "👋" },
+    { component: <Skills />, name: "Skills", icon: "⚡" },
+    { component: <Experience />, name: "Experience", icon: "💼" },
+    { component: <Projects />, name: "Projects", icon: "🚀" },
 ];
 
 const Home = () => {
     const [currentSection, setCurrentSection] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
 
     const scrollToSection = (index) => {
         const sectionId = `section-${index}`;
@@ -24,6 +26,19 @@ const Home = () => {
             setCurrentSection(index);
         }
     };
+
+    // Force scroll to top on mount
+    useEffect(() => {
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+        
+        window.scrollTo(0, 0);
+        
+        if (window.location.hash) {
+            window.history.replaceState(null, null, ' ');
+        }
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -53,52 +68,109 @@ const Home = () => {
                 currentSlide={currentSection}
             />
 
-            {/* Left Sidebar Navigation */}
-            <div className="fixed left-0 top-0 h-screen w-32 bg-gray-400 backdrop-blur-md border-r border-gray-200 z-50 flex flex-col items-center justify-center shadow-lg">
-                <div className="space-y-6">
+            {/* Futuristic Left Sidebar Navigation */}
+            <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="fixed left-0 top-0 h-screen w-20 md:w-24 bg-slate-900/95 backdrop-blur-xl border-r border-white/10 z-50 flex flex-col items-center justify-center shadow-2xl shadow-black/50"
+            >
+                {/* Decorative top element */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-full bg-slate-900"></div>
+                    </div>
+                </div>
+
+                {/* Navigation buttons */}
+                <div className="space-y-4">
                     {sections.map((section, index) => (
-                        <button
+                        <motion.button
                             key={index}
                             onClick={() => scrollToSection(index)}
-                            className="group relative w-full flex items-center justify-center"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="group relative w-full flex flex-col items-center justify-center"
+                            aria-label={`Navigate to ${section.name}`}
                         >
+                            {/* Active indicator line */}
+                            {currentSection === index && (
+                                <motion.div
+                                    layoutId="activeSection"
+                                    className="absolute -left-[1px] w-1 h-12 bg-gradient-to-b from-cyan-500 to-purple-500 rounded-r-full"
+                                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                />
+                            )}
+
+                            {/* Icon/Button */}
                             <div
-                                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                                className={`relative w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
                                     currentSection === index
-                                        ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg scale-105"
-                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                        ? "bg-gradient-to-br from-cyan-600 to-purple-600 shadow-lg shadow-cyan-500/50"
+                                        : "bg-white/5 hover:bg-white/10"
+                                }`}
+                            >
+                                <span className="text-2xl">{section.icon}</span>
+                                
+                                {/* Glow effect on active */}
+                                {currentSection === index && (
+                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 to-purple-600 rounded-xl blur-xl opacity-50 -z-10"></div>
+                                )}
+                            </div>
+
+                            {/* Tooltip on hover */}
+                            <div
+                                className={`absolute left-full ml-4 px-4 py-2 bg-slate-800/95 backdrop-blur-sm border border-white/10 text-white text-2xl font-bold rounded-lg whitespace-nowrap pointer-events-none transition-all duration-300 ${
+                                    isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                                 }`}
                             >
                                 {section.name}
+                                <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-800 border-l border-t border-white/10 rotate-45 -mr-1"></div>
                             </div>
-                            {currentSection === index && (
-                                <div className="absolute -left-4 w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-r-full" />
-                            )}
-                        </button>
+
+                            {/* Section number */}
+                            <span className={`mt-1 text-xs font-bold transition-colors ${
+                                currentSection === index ? 'text-cyan-400' : 'text-gray-500'
+                            }`}>
+                                0{index + 1}
+                            </span>
+                        </motion.button>
                     ))}
                 </div>
 
-                <div className="absolute bottom-8 flex flex-col items-center gap-2">
+                {/* Progress indicators at bottom */}
+                <div className="absolute bottom-8 flex flex-col items-center gap-3">
                     {sections.map((_, index) => (
-                        <div
+                        <motion.button
                             key={index}
-                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                                currentSection === index
-                                    ? "bg-indigo-500 h-8"
-                                    : "bg-gray-300"
-                            }`}
-                        />
+                            onClick={() => scrollToSection(index)}
+                            className="group relative"
+                            whileHover={{ scale: 1.2 }}
+                        >
+                            <div
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                    currentSection === index
+                                        ? "bg-gradient-to-b from-cyan-500 to-purple-500 w-2 h-6"
+                                        : "bg-white/20 hover:bg-white/40"
+                                }`}
+                            />
+                        </motion.button>
                     ))}
                 </div>
-            </div>
 
-            {/* Vertical scrolling sections with padding for footer */}
-            <div className="ml-32 pb-64">
+                {/* Decorative bottom element */}
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-px h-8 bg-gradient-to-b from-white/10 to-transparent"></div>
+            </motion.div>
+
+            {/* Main content - FIXED FOOTER GAP */}
+            <div className="ml-20 md:ml-24">
                 {sections.map((section, index) => (
                     <section
                         key={index}
                         id={`section-${index}`}
-                        className={`w-full min-h-screen bg-gradient-to-br ${section.color} flex items-center justify-center`}
+                        className="w-full min-h-screen flex items-center justify-center"
                     >
                         <div className="w-full">
                             {section.component}
@@ -107,8 +179,10 @@ const Home = () => {
                 ))}
             </div>
 
-            {/* Fixed Footer */}
-            <Footer scrollToSection={scrollToSection} sections={sections} />
+            {/* Footer - NO GAP */}
+            <div className="ml-20 md:ml-24">
+                <Footer scrollToSection={scrollToSection} sections={sections} />
+            </div>
         </div>
     );
 };
