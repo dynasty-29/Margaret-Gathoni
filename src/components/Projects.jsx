@@ -1,124 +1,133 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaGithub, FaExternalLinkAlt, FaTimes, FaCode, FaChartLine, FaGamepad, FaRocket } from "react-icons/fa";
-import { HiLightningBolt } from "react-icons/hi";
-import { MdTrendingUp } from "react-icons/md";
+import { FaGithub, FaExternalLinkAlt, FaTimes, FaCode, FaChartLine, FaDatabase, FaRocket } from "react-icons/fa";
 
 const featuredProjects = {
   "Software Projects": [
     {
       name: "Mama Africa",
-      link: "https://your-link-here.com",
-      github: "https://github.com/yourusername/mama-africa",
+      link: "https://mama-africa.onrender.com/",
       description: "Comprehensive maternity support platform for African mothers with health tracking, community features, and expert consultation.",
       tags: ["Flask", "React", "Tailwind", "PostgreSQL"],
       type: "web",
-      color: "from-pink-500 to-rose-500",
-      stats: { users: "500+", features: "15+", rating: "4.8" }
+      color: "from-cyan-500 to-lime-500",
     },
     {
       name: "GlowUp",
-      link: "https://your-link-here.com",
-      github: "https://github.com/yourusername/glowup",
+      link: "https://glow-up-eta.vercel.app/",
       description: "Privacy-first menstrual health tracking app with AI-powered cycle predictions and personalized insights.",
-      tags: ["React", "Django", "ML", "TypeScript"],
+      tags: ["NextJS", "FastAPI", "Tailwind", "PostgreSQL", "AI", "Docker"], 
       type: "web",
       color: "from-purple-500 to-indigo-500",
-      stats: { accuracy: "95%", users: "1K+", features: "20+" }
     },
     {
       name: "Vendor Portal",
       link: "https://vendorportal.cihebkenya.org/",
-      github: "https://github.com/yourusername/vendor-portal",
       description: "Enterprise-grade vendor prequalification & procurement management system for CIHEB-Kenya.",
-      tags: ["Django", "PostgreSQL", "REST API", "Docker"],
+      tags: ["NextJs", "MySQL", "Tailwind", "C#", "Docker"],
       type: "web",
-      color: "from-blue-500 to-cyan-500",
-      stats: { vendors: "100+", contracts: "50+", uptime: "99.9%" }
+      color: "from-green-500 to-cyan-500",
     },
     {
       name: "NorthStart Systems",
       link: "https://northstartsystems.com/",
-      github: "https://github.com/yourusername/northstart",
       description: "Modern ICT & Security solutions company website with integrated project management dashboard.",
-      tags: ["React", "Node.js", "MongoDB", "Express"],
+      tags: ["Typescript", "PHP", "PostgreSQL", "Tailwind"],
       type: "web",
       color: "from-emerald-500 to-teal-500",
-      stats: { clients: "30+", projects: "50+", satisfaction: "98%" }
     },
     {
-      name: "Payroll System",
-      link: "https://your-link-here.com",
-      github: "https://github.com/yourusername/payroll",
-      description: "Custom payroll automation system with advanced leave management and HR analytics.",
-      tags: ["Flask", "React", "MySQL", "Redis"],
+      name: "Weather Focus web app",
+      link: "https://skycast-qjkm.vercel.app/",
+      description: "Real-time weather application with beautiful UI and accurate forecasting using Weather API.",
+      tags: ["Typescript", "Tailwind", "Weather API"],
       type: "web",
-      color: "from-orange-500 to-amber-500",
-      stats: { employees: "200+", accuracy: "100%", automation: "90%" }
+      color: "from-blue-500 to-amber-500",
+    },
+    {
+      name: "Pomodoro Pro",
+      link: "https://flow-force-sigma.vercel.app/",
+      description: "AI supported productivity app combining Pomodoro technique with task management and focus music.",
+      tags: ["TypeScript", "FastAPI", "PostgreSQL"],
+      type: "chrome-extension",
+      color: "from-forest-500 to-lime-500",
     },
   ],
-
-  "Data Science Projects": [
+"Data Science Projects": [
     {
-      name: "Clinical NLP Predictor",
-      link: "https://github.com/yourusername/clinical-nlp",
-      github: "https://github.com/yourusername/clinical-nlp",
-      description: "Fine-tuned BERT model predicting clinician responses using advanced ROUGE scoring and sentiment analysis.",
-      tags: ["Python", "BERT", "NLP", "PyTorch", "Transformers"],
+      name: "Chest Disease Detection",
+      github: "https://github.com/dynasty-29/Chest_Disease_detection/blob/main/Disease_detection_Project.ipynb",
+      description: "Deep learning model for medical image classification detecting chest diseases from X-ray images using convolutional neural networks built with Keras and TensorFlow.",
+      tags: ["Python", "Keras", "TensorFlow", "CNN", "Medical Imaging"],
       type: "data",
-      color: "from-violet-500 to-purple-500",
-      stats: { accuracy: "92%", dataset: "50K+", f1Score: "0.89" }
+      color: "from-red-500 to-rose-500",
+      stats: { accuracy: "53%", precision: "61%", f1Score: "0.50" }
     },
     {
-      name: "Crypto Market Predictor",
-      link: "https://github.com/yourusername/crypto-predictor",
-      github: "https://github.com/yourusername/crypto-predictor",
-      description: "Advanced time-series prediction using Pearson correlation optimization on cryptocurrency market data.",
-      tags: ["Python", "TensorFlow", "Pandas", "Scikit-learn"],
+      name: "Amazon Alexa Sentiment Analysis",
+      github: "https://github.com/dynasty-29/sentiment_analysis/blob/main/Sentiment_Analysis_on_Customers'_review.ipynb",
+      description: "NLP-powered sentiment classification system analyzing Amazon Alexa customer reviews using multiple ML algorithms including Naive Bayes and Logistic Regression.",
+      tags: ["Python", "NLP", "Naive Bayes", "Scikit-learn", "NLTK"],
       type: "data",
-      color: "from-yellow-500 to-orange-500",
-      stats: { accuracy: "85%", coins: "10+", predictions: "Daily" }
+      color: "from-amber-500 to-orange-500",
+      stats: { accuracy: "95%", models: "2+", reviews: "3K+" }
     },
     {
-      name: "Public Health Dashboard",
-      link: "https://your-dashboard-link.com",
-      github: "https://github.com/yourusername/health-dashboard",
-      description: "Comprehensive Power BI dashboard integrating DHIS2, KenyaEMR, and AIMS datasets for healthcare insights.",
-      tags: ["Power BI", "Python", "ETL", "SQL"],
+      name: "Book Genre Classifier",
+      github: "https://github.com/dynasty-29/Book-Genre-Classification/blob/main/Book_Genre_Classification.ipynb",
+      description: "Text classification model categorizing books into genres using NLP techniques with Multinomial Naive Bayes and Support Vector Classification achieving strong accuracy.",
+      tags: ["Python", "NLP", "SVC", "MultinomialNB", "Text Classification"],
+      type: "data",
+      color: "from-purple-500 to-violet-500",
+      stats: { accuracy: "77.5%", models: "2+", genres: "Multi" }
+    },
+    {
+      name: "Garment Worker Productivity",
+      github: "https://github.com/dynasty-29/Productivity-Prediction-Project/blob/main/productivity_prediction_final.ipynb",
+      description: "Predictive analytics model forecasting garment industry employee productivity using MLP neural networks, optimized for minimal prediction error.",
+      tags: ["Python", "MLP", "Regression", "Pandas", "Scikit-learn"],
+      type: "data",
+      color: "from-cyan-500 to-teal-500",
+      stats: { rmse: "0.144", model: "MLP", features: "15+" }
+    },
+    {
+      name: "Carbon Emission Predictor",
+      github: "https://github.com/dynasty-29/carbon_emmision_streamlit_prototype_app/blob/main/predictor_model.ipynb",
+      description: "Environmental impact prediction model using XGBoost to forecast carbon emissions with comprehensive evaluation metrics for sustainability analysis.",
+      tags: ["Python", "XGBoost", "Environmental ML", "Pandas", "Feature Engineering"],
       type: "data",
       color: "from-green-500 to-emerald-500",
-      stats: { facilities: "15+", records: "100K+", users: "50+" }
-    },
-  ],
-
-  "Game Development": [
-    {
-      name: "Black Magic",
-      link: "https://your-game-link.com",
-      github: "https://github.com/yourusername/black-magic",
-      description: "Narrative-driven adventure exploring choice and consequence. Built for Global Game Jam with branching storylines.",
-      tags: ["Unity", "C#", "Game Design", "Narrative"],
-      type: "game",
-      color: "from-red-500 to-pink-500",
-      stats: { players: "1K+", rating: "4.5", hours: "5+" }
+      stats: { r2Score: "0.83", mae: "1.42", model: "XGB" }
     },
     {
-      name: "Secret Letters",
-      link: "https://your-game-link.com",
-      github: "https://github.com/yourusername/secret-letters",
-      description: "Innovative wordplay puzzle game focusing on communication and storytelling mechanics.",
-      tags: ["Unity", "C#", "Puzzle Design", "UI/UX"],
-      type: "game",
+      name: "Handwritten Digit Recognizer",
+      github: "https://www.kaggle.com/code/margaretgathoni/digit-recognizer",
+      description: "High-accuracy neural network for handwritten digit recognition built with PyTorch, trained on the MNIST dataset achieving near-perfect classification.",
+      tags: ["Python", "PyTorch", "CNN", "MNIST", "Deep Learning"],
+      type: "data",
       color: "from-indigo-500 to-blue-500",
-      stats: { puzzles: "50+", rating: "4.7", downloads: "500+" }
+      stats: { accuracy: "97%", dataset: "MNIST", framework: "PyTorch" }
     },
   ],
+  "Data Analysis Projects": [
+    {
+      name: "Coming Soon",
+      github: "",
+      description: "Exciting data analysis projects are in development. Check back soon for interactive dashboards and business intelligence visualizations.",
+      tags: ["Power BI", "Tableau", "SQL", "Excel"],
+      type: "data",
+      color: "from-pink-500 to-rose-500",
+      stats: { status: "Soon", dashboards: "3+", insights: "∞" }
+    },
+  ], 
+
+  
 };
 
 const categoryIcons = {
   "Software Projects": FaCode,
   "Data Science Projects": FaChartLine,
-  "Game Development": FaGamepad,
+  "Data Analysis Projects": FaDatabase,
 };
 
 const Projects = () => {
@@ -129,6 +138,8 @@ const Projects = () => {
   const sectionRef = useRef(null);
 
   useEffect(() => {
+    const currentRef = sectionRef.current;
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -138,19 +149,19 @@ const Projects = () => {
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
   }, []);
 
-  const totalProjects = Object.values(featuredProjects).flat().length;
-  const totalTechnologies = [...new Set(Object.values(featuredProjects).flat().flatMap(p => p.tags))].length;
+  // const totalProjects = Object.values(featuredProjects).flat().length;
+  // const totalTechnologies = [...new Set(Object.values(featuredProjects).flat().flatMap(p => p.tags))].length;
 
   return (
     <section 
@@ -187,6 +198,7 @@ const Projects = () => {
             A collection of innovative solutions spanning web development, data science, and interactive experiences
           </p>
         </div>
+        
 
         {/* Category Tabs */}
         <div className="flex flex-wrap justify-center gap-4 mb-16">
@@ -263,17 +275,19 @@ const Projects = () => {
                     </p>
                   </div>
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    {Object.entries(project.stats).map(([key, value], idx) => (
-                      <div key={idx} className="bg-white/5 rounded-lg p-2 text-center border border-white/10">
-                        <div className={`text-lg font-bold bg-gradient-to-r ${project.color} bg-clip-text text-transparent`}>
-                          {value}
+                  {/* Stats - Only render if stats exist */}
+                  {project.stats && (
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      {Object.entries(project.stats).map(([key, value], idx) => (
+                        <div key={idx} className="bg-white/5 rounded-lg p-2 text-center border border-white/10">
+                          <div className={`text-lg font-bold bg-gradient-to-r ${project.color} bg-clip-text text-transparent`}>
+                            {value}
+                          </div>
+                          <div className="text-xs text-gray-500 uppercase">{key}</div>
                         </div>
-                        <div className="text-xs text-gray-500 uppercase">{key}</div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -292,7 +306,7 @@ const Projects = () => {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Conditional GitHub link */}
                   <div className="flex gap-3 mt-auto">
                     <button
                       onClick={() => project.type === 'web' ? setSelectedProject(project) : window.open(project.link, '_blank')}
@@ -301,15 +315,18 @@ const Projects = () => {
                       <FaRocket className="group-hover:translate-x-1 transition-transform" />
                       {project.type === 'web' ? 'Preview' : 'View'}
                     </button>
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 hover:border-cyan-500/50 transition-all group"
-                      aria-label="GitHub"
-                    >
-                      <FaGithub className="text-xl group-hover:scale-110 transition-transform" />
-                    </a>
+                    {/* Only show GitHub button for Data Science projects */}
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 hover:border-cyan-500/50 transition-all group"
+                        aria-label="GitHub"
+                      >
+                        <FaGithub className="text-xl group-hover:scale-110 transition-transform" />
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -322,37 +339,7 @@ const Projects = () => {
           ))}
         </motion.div>
 
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { value: totalProjects, label: "Total Projects", icon: FaRocket, color: "from-cyan-500 to-blue-500" },
-            { value: Object.keys(featuredProjects).length, label: "Categories", icon: FaCode, color: "from-purple-500 to-pink-500" },
-            { value: totalTechnologies, label: "Technologies", icon: HiLightningBolt, color: "from-green-500 to-emerald-500" },
-            { value: "98%", label: "Success Rate", icon: MdTrendingUp, color: "from-orange-500 to-yellow-500" }
-          ].map((stat, index) => {
-            const IconComponent = stat.icon;
-            return (
-              <div
-                key={index}
-                className="group relative"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity`}></div>
-                <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 text-center group-hover:scale-105 transition-transform">
-                  <IconComponent className="text-4xl text-gray-400 group-hover:text-white mx-auto mb-3 transition-colors" />
-                  <div className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
-                    {stat.value}+
-                  </div>
-                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                    {stat.label}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
+      </div>    
       {/* Preview Modal */}
       <AnimatePresence>
         {selectedProject && (
@@ -407,15 +394,18 @@ const Projects = () => {
                 
                 {/* Overlay with action buttons */}
                 <div className="absolute bottom-6 right-6 flex gap-3">
-                  <a
-                    href={selectedProject.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all"
-                  >
-                    <FaGithub />
-                    View Code
-                  </a>
+                  {/* Only show GitHub button in modal if project has github link */}
+                  {selectedProject.github && (
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all"
+                    >
+                      <FaGithub />
+                      View Code
+                    </a>
+                  )}
                   <a
                     href={selectedProject.link}
                     target="_blank"

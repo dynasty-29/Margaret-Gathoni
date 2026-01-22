@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Introduction from "./components/Introduction";
 import Skills from "./components/Skills";
 import Experience from "./components/Experience";
@@ -9,9 +9,10 @@ import { motion } from "framer-motion";
 
 const sections = [
     { component: <Introduction />, name: "Introduction", icon: "👋" },
+    { component: <Projects />, name: "Projects", icon: "🚀" },
     { component: <Skills />, name: "Skills", icon: "⚡" },
     { component: <Experience />, name: "Experience", icon: "💼" },
-    { component: <Projects />, name: "Projects", icon: "🚀" },
+    
 ];
 
 const Home = () => {
