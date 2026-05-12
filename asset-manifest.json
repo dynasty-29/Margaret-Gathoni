@@ -1,17 +1,18 @@
 {
   "files": {
-    "main.css": "/Margaret-Gathoni/static/css/main.26f85e3c.css",
-    "main.js": "/Margaret-Gathoni/static/js/main.04d73156.js",
+    "main.css": "/Margaret-Gathoni/static/css/main.15146849.css",
+    "main.js": "/Margaret-Gathoni/static/js/main.36abedb9.js",
     "static/js/453.1407b060.chunk.js": "/Margaret-Gathoni/static/js/453.1407b060.chunk.js",
     "static/media/waves.gif": "/Margaret-Gathoni/static/media/waves.9193863b6e433772e764.gif",
     "static/media/header-img.png": "/Margaret-Gathoni/static/media/header-img.746c645f22138e294a96.png",
+    "static/media/logo2.png": "/Margaret-Gathoni/static/media/logo2.339272fca8b95dbdc1d7.png",
     "index.html": "/Margaret-Gathoni/index.html",
-    "main.26f85e3c.css.map": "/Margaret-Gathoni/static/css/main.26f85e3c.css.map",
-    "main.04d73156.js.map": "/Margaret-Gathoni/static/js/main.04d73156.js.map",
+    "main.15146849.css.map": "/Margaret-Gathoni/static/css/main.15146849.css.map",
+    "main.36abedb9.js.map": "/Margaret-Gathoni/static/js/main.36abedb9.js.map",
     "453.1407b060.chunk.js.map": "/Margaret-Gathoni/static/js/453.1407b060.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.26f85e3c.css",
-    "static/js/main.04d73156.js"
+    "static/css/main.15146849.css",
+    "static/js/main.36abedb9.js"
   ]
 }
