@@ -1,350 +1,505 @@
 import { useState, useEffect, useRef } from "react";
-import { FaPython } from "react-icons/fa";
-import { SiFlask, SiDjango, SiFlutter, SiMysql, SiPostgresql, SiSqlite, SiDocker, SiJenkins, SiPytorch} from "react-icons/si";
-import { RiReactjsFill, RiNextjsFill } from "react-icons/ri";
-import { TbBrandReactNative } from "react-icons/tb";
-import { VscAzure } from "react-icons/vsc";
-import { FaAws } from "react-icons/fa6";
-import { 
-  FaChartLine,
-  FaLanguage,
-  FaRobot
-} from "react-icons/fa";
-import { FaBrain } from "react-icons/fa6";
 
 const skills = {
   "Languages & Frameworks": [
-    { name: "Python", level: 95, icon: FaPython, color: "from-blue-400 to-yellow-400", description: "Backend development & Data Science" },
-    { name: "Flask", level: 90, icon: SiFlask, color: "from-gray-700 to-gray-900", description: "RESTful API development" },
-    { name: "Django", level: 85, icon: SiDjango, color: "from-green-600 to-green-800", description: "Full-stack web applications" },
-    { name: "ReactJS", level: 90, icon: RiReactjsFill, color: "from-cyan-400 to-blue-500", description: "Modern UI development" },
-    { name: "NextJS", level: 85, icon: RiNextjsFill, color: "from-gray-800 to-black", description: "Server-side rendering" },
-    { name: "Flutter", level: 80, icon: SiFlutter, color: "from-blue-400 to-cyan-500", description: "Cross-platform mobile" },
-    { name: "React Native", level: 80, icon: TbBrandReactNative, color: "from-blue-500 to-purple-500", description: "Native mobile apps" },
+    { name: "Python",        level: 95, description: "Backend development & data science" },
+    { name: "Flask",         level: 90, description: "RESTful API development" },
+    { name: "Django",        level: 85, description: "Full-stack web applications" },
+    { name: "ReactJS",       level: 90, description: "Modern UI development" },
+    { name: "NextJS",        level: 85, description: "Server-side rendering" },
+    { name: "Flutter",       level: 80, description: "Cross-platform mobile" },
+    { name: "React Native",  level: 80, description: "Native mobile apps" },
   ],
   "Databases": [
-    { name: "MySQL", level: 90, icon: SiMysql, color: "from-blue-500 to-orange-400", description: "Relational database design" },
-    { name: "PostgreSQL", level: 85, icon: SiPostgresql, color: "from-blue-600 to-blue-800", description: "Advanced SQL queries" },
-    { name: "SQLite", level: 80, icon: SiSqlite, color: "from-yellow-600 to-yellow-800", description: "Embedded databases" },
+    { name: "MySQL",      level: 90, description: "Relational database design" },
+    { name: "PostgreSQL", level: 85, description: "Advanced SQL queries" },
+    { name: "SQLite",     level: 80, description: "Embedded databases" },
+    { name: "MongoDB",    level: 75, description: "NoSQL document store" },
   ],
   "Cloud & DevOps": [
-    { name: "Docker", level: 85, icon: SiDocker, color: "from-blue-400 to-blue-600", description: "Containerization" },
-    { name: "Jenkins", level: 60, icon: SiJenkins, color: "from-red-500 to-gray-700", description: "CI/CD pipelines" },
-    { name: "Azure", level: 75, icon: VscAzure, color: "from-blue-500 to-cyan-400", description: "Cloud infrastructure" },
-    { name: "AWS", level: 80, icon: FaAws, color: "from-yellow-400 to-orange-500", description: "Cloud services" },
+    { name: "Docker",   level: 85, description: "Containerisation" },
+    { name: "Jenkins",  level: 60, description: "CI/CD pipelines" },
+    { name: "Azure",    level: 75, description: "Cloud infrastructure" },
+    { name: "AWS",      level: 80, description: "Cloud services" },
   ],
   "Data & AI": [
-    { name: "Power BI", level: 90, icon: FaChartLine, color: "from-yellow-400 to-orange-500", description: "Business intelligence" },
-    { name: "Tableau", level: 85, icon: FaChartLine, color: "from-blue-400 to-orange-400", description: "Data visualization" },
-    { name: "EDA", level: 90, icon: FaChartLine, color: "from-purple-500 to-pink-500", description: "Exploratory analysis" },
-    { name: "PyTorch", level: 70, icon: SiPytorch, color: "from-red-600 to-red-800", description: "Deep learning framework" },
-    { name: "Machine Learning", level: 85, icon: FaBrain, color: "from-indigo-500 to-purple-600", description: "Predictive modeling" },
-    { name: "NLP", level: 80, icon: FaLanguage, color: "from-green-500 to-teal-500", description: "Natural language processing" },
-    { name: "Deep Learning", level: 80, icon: FaRobot, color: "from-purple-600 to-pink-600", description: "Neural networks" },
+    { name: "Power BI",        level: 90, description: "Business intelligence" },
+    { name: "Tableau",         level: 85, description: "Data visualisation" },
+    { name: "EDA",             level: 90, description: "Exploratory analysis" },
+    { name: "PyTorch",         level: 70, description: "Deep learning framework" },
+    { name: "Machine Learning",level: 85, description: "Predictive modelling" },
+    { name: "NLP",             level: 80, description: "Natural language processing" },
+    { name: "Deep Learning",   level: 80, description: "Neural networks" },
   ],
+  "Game Development": [
+    { name: "Unity",              level: 75, description: "Game engine development" },
+    { name: "Unreal Engine",      level: 20, description: "High-end game development" },
+    { name: "Phaser.js",          level: 60, description: "2D browser game development" },
+    { name: "Three.js",           level: 52, description: "3D interactive experiences and prototypes" },
+    { name: "Technical Design",   level: 48, description: "Bridging gameplay and engineering" },
+    { name: "Level Design",       level: 40, description: "Player flow, pacing, encounter design" },
+    { name: "Game Systems Design",level: 48, description: "Core loops, progression, balancing" },
+    { name: "Game Analytics",     level: 88, description: "Player metrics and balancing insights" },
+    { name: "Game DevOps",        level: 38, description: "CI/CD, cloud infrastructure, multiplayer backend and live game operations" },
+  ]
+};
+
+const certifications = [
+  "AWS Cloud Practitioner",
+  "Kaggle BIPOC Grant Program",
+  "Full Stack Development",
+  "Unity Game Development",
+];
+
+const DotBar = ({ level }) => {
+  const filled = Math.floor(level / 20);
+  return (
+    <div className="sk-dots" aria-label={`Proficiency ${level}%`}>
+      {[0,1,2,3,4].map(i => (
+        <span key={i} className={`sk-dot ${i < filled ? "sk-dot--on" : ""}`} aria-hidden="true" />
+      ))}
+    </div>
+  );
+};
+
+const Bar = ({ level, animate }) => (
+  <div className="sk-bar-track" role="progressbar" aria-valuenow={level} aria-valuemin={0} aria-valuemax={100}>
+    <div
+      className="sk-bar-fill"
+      style={{ width: animate ? `${level}%` : "0%" }}
+    />
+  </div>
+);
+
+const CategoryIcon = ({ cat }) => {
+  const icons = {
+    "Languages & Frameworks": (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+    ),
+    "Databases": (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+      </svg>
+    ),
+    "Cloud & DevOps": (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+      </svg>
+    ),
+    "Data & AI": (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      </svg>
+    ),
+    "Game Development": (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+    ),
+  };
+  return icons[cat] || null;
+};
+
+const InitialBadge = ({ name }) => {
+  const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  return <span className="sk-initial">{initials}</span>;
 };
 
 const Skills = () => {
   const [activeCategory, setActiveCategory] = useState("Languages & Frameworks");
-  const [hoveredSkill, setHoveredSkill] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [hoveredSkill, setHoveredSkill]     = useState(null);
+  const [isVisible, setIsVisible]           = useState(false);
   const sectionRef = useRef(null);
 
-  // Intersection Observer for animations
   useEffect(() => {
+    // Fix: copy ref value to a local variable for use in cleanup
+    const node = sectionRef.current;
+    if (!node) return;
+
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      { threshold: 0.08 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
+    observer.observe(node);
+    return () => { observer.unobserve(node); };
   }, []);
 
-  // Calculate total skills
-  const totalSkills = Object.values(skills).flat().length;
-  const avgProficiency = Math.round(
-    Object.values(skills).flat().reduce((sum, skill) => sum + skill.level, 0) / totalSkills
-  );
-
   return (
-    <section 
-      ref={sectionRef}
-      className="relative min-h-screen w-full flex flex-col justify-center items-center py-20 px-6 bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 overflow-hidden"
-    >
-      {/* Animated background particles */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-      </div>
+    <section ref={sectionRef} className="sk-section">
 
-      {/* Decorative grid */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMDMiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
+      {/* BG */}
+      <div className="sk-bg-dots"  aria-hidden="true" />
+      <div className="sk-bg-hline" style={{ top: "30%" }} aria-hidden="true" />
+      <div className="sk-bg-hline" style={{ top: "65%" }} aria-hidden="true" />
+      <div className="sk-bg-vline" aria-hidden="true" />
+      <div className="sk-bg-glow sk-bg-glow--1" aria-hidden="true" />
+      <div className="sk-bg-glow sk-bg-glow--2" aria-hidden="true" />
 
-      {/* Content */}
-      <div className={`relative z-10 w-full max-w-7xl transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+      <div className={`sk-wrap ${isVisible ? "sk-wrap--visible" : ""}`}>
+
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 mb-6 animate-fade-in">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
-            </span>
-            <span className="text-sm font-semibold text-purple-300">Technical Arsenal</span>
+        <header className="sk-header">
+          <div className="sk-overline">
+            <span className="sk-overline__dash" aria-hidden="true" />
+            Technical Arsenal
           </div>
-          
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
-              Skills & Expertise
-            </span>
+          <h2 className="sk-title">
+            Skills &amp;<br />
+            <span className="sk-title--cyan">Expertise</span>
           </h2>
-          
-          <p className="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
-            A comprehensive toolkit spanning full-stack development, cloud infrastructure, 
+          <p className="sk-subtitle">
+            A comprehensive toolkit spanning full-stack development, cloud infrastructure,
             and cutting-edge AI/ML technologies
           </p>
-        </div>
+        </header>
 
-        {/* Category Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mb-16">
-          {Object.keys(skills).map((category, index) => (
+        {/* Category tabs */}
+        <div className="sk-tabs" role="tablist">
+          {Object.keys(skills).map((cat) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`group relative px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                activeCategory === category
-                  ? "text-white scale-105"
-                  : "text-gray-400 hover:text-white"
-              }`}
-              style={{ animationDelay: `${index * 100}ms` }}
+              key={cat}
+              role="tab"
+              aria-selected={activeCategory === cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`sk-tab ${activeCategory === cat ? "sk-tab--active" : ""}`}
             >
-              {activeCategory === category && (
-                <>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-50"></div>
-                </>
-              )}
-              {activeCategory !== category && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 group-hover:border-purple-500/50 transition-all"></div>
-              )}
-              <span className="relative z-10 flex items-center gap-2">
-                {category}
-                <span className="text-xs bg-white/10 px-2 py-1 rounded-full">
-                  {skills[category].length}
-                </span>
-              </span>
+              <CategoryIcon cat={cat} />
+              <span>{cat}</span>
+              <span className="sk-tab__count">{skills[cat].length}</span>
             </button>
           ))}
         </div>
 
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+        {/* Skills grid */}
+        <div className="sk-grid" role="tabpanel">
           {skills[activeCategory].map((skill, index) => {
-            const IconComponent = skill.icon;
+            const isHovered = hoveredSkill === skill.name;
             return (
               <div
                 key={skill.name}
+                className={`sk-card ${isHovered ? "sk-card--hovered" : ""}`}
+                style={{ animationDelay: `${index * 0.07}s` }}
                 onMouseEnter={() => setHoveredSkill(skill.name)}
                 onMouseLeave={() => setHoveredSkill(null)}
-                className="group relative"
-                style={{
-                  animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
-                }}
               >
-                {/* Glow effect */}
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${skill.color} rounded-2xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500`}></div>
-                
-                {/* Card */}
-                <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 h-full">
-                  {/* Icon and Name */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${skill.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                      <IconComponent className="text-3xl text-white" />
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        {skill.level}
-                      </span>
-                      <span className="text-xs text-gray-500 font-medium">%</span>
-                    </div>
+                <div className="sk-card__topline" aria-hidden="true" />
+
+                <div className="sk-card__body">
+                  <div className="sk-card__top">
+                    <InitialBadge name={skill.name} />
+                    <span className="sk-card__level">{skill.level}<span className="sk-card__pct">%</span></span>
                   </div>
 
-                  {/* Skill Info */}
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">
-                      {skill.name}
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      {skill.description}
-                    </p>
+                  <h3 className="sk-card__name">{skill.name}</h3>
+                  <p className="sk-card__desc">{skill.description}</p>
+
+                  <div className="sk-card__foot">
+                    <span className="sk-card__prof-lbl">Proficiency</span>
+                    <DotBar level={skill.level} />
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wider">Proficiency</span>
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <div
-                            key={i}
-                            className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                              i < Math.floor(skill.level / 20)
-                                ? `bg-gradient-to-r ${skill.color}`
-                                : "bg-white/10"
-                            }`}
-                            style={{ transitionDelay: `${i * 100}ms` }}
-                          ></div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="relative w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`absolute inset-y-0 left-0 bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ease-out`}
-                        style={{ 
-                          width: hoveredSkill === skill.name ? `${skill.level}%` : '0%',
-                          transitionDelay: hoveredSkill === skill.name ? `${index * 50}ms` : '0ms'
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hover badge */}
-                  <div className={`absolute -top-3 -right-3 bg-gradient-to-r ${skill.color} text-white text-xs font-bold px-3 py-1 rounded-full transform transition-all duration-300 ${
-                    hoveredSkill === skill.name ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
-                  }`}>
-                    Expert
-                  </div>
+                  <Bar level={skill.level} animate={isHovered} />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                {totalSkills}+
-              </div>
-              <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Technologies</div>
-              <div className="mt-2 flex justify-center">
-                <div className="w-12 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
-                {avgProficiency}%
-              </div>
-              <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Avg Proficiency</div>
-              <div className="mt-2 flex justify-center">
-                <div className="w-12 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-5xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
-                6+
-              </div>
-              <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Years Experience</div>
-              <div className="mt-2 flex justify-center">
-                <div className="w-12 h-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-            <div className="relative bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2">
-                50+
-              </div>
-              <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Projects</div>
-              <div className="mt-2 flex justify-center">
-                <div className="w-12 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Certifications */}
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-white mb-6">Certifications & Achievements</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              { name: "AWS Cloud Practitioner", color: "from-orange-500 to-yellow-500" },
-              { name: "Kaggle BIPOC Grant Program", color: "from-blue-500 to-cyan-500" },
-              { name: "Full Stack Development", color: "from-purple-500 to-pink-500" }
-            ].map((cert, index) => (
-              <div
-                key={index}
-                className="group relative"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${cert.color} rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity`}></div>
-                <div className="relative bg-white/5 backdrop-blur-md px-6 py-3 rounded-xl border border-white/10 group-hover:border-white/20 transition-all">
-                  <span className="text-gray-300 font-medium">🏆 {cert.name}</span>
-                </div>
+        <div className="sk-certs">
+          <div className="sk-certs__label">
+            <span className="sk-overline__dash" aria-hidden="true" />
+            Certifications &amp; Achievements
+          </div>
+          <div className="sk-certs__list">
+            {certifications.map((cert, i) => (
+              <div key={i} className="sk-cert">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {cert}
               </div>
             ))}
           </div>
         </div>
+
       </div>
 
       <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;1,300;1,500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@300;400&display=swap');
+
+        :root {
+          --bg:        #f0fafa;
+          --surface:   rgba(255,255,255,0.72);
+          --surface2:  rgba(255,255,255,0.45);
+          --border:    rgba(6,182,212,0.16);
+          --border-h:  rgba(6,182,212,0.42);
+          --ink:       #0b2028;
+          --ink-muted: rgba(11,32,40,0.45);
+          --cyan:      #06b6d4;
+          --cyan2:     #0891b2;
+          --cyan-dim:  rgba(6,182,212,0.1);
+          --cyan-text: rgba(6,182,212,0.7);
+          --dot:       rgba(6,182,212,0.18);
+          --glow:      rgba(6,182,212,0.07);
+          --sep:       rgba(6,182,212,0.18);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg:        #060e12;
+            --surface:   rgba(13,30,38,0.82);
+            --surface2:  rgba(13,30,38,0.5);
+            --border:    rgba(34,211,238,0.11);
+            --border-h:  rgba(34,211,238,0.34);
+            --ink:       #e8f6fa;
+            --ink-muted: rgba(200,235,245,0.4);
+            --cyan:      #22d3ee;
+            --cyan2:     #67e8f9;
+            --cyan-dim:  rgba(34,211,238,0.07);
+            --cyan-text: rgba(34,211,238,0.55);
+            --dot:       rgba(34,211,238,0.11);
+            --glow:      rgba(34,211,238,0.05);
+            --sep:       rgba(34,211,238,0.13);
           }
         }
 
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
+        .sk-section {
+          position: relative;
+          min-height: 100vh;
+          width: 100%;
+          background: var(--bg);
+          font-family: 'Geist', sans-serif;
+          overflow: hidden;
+          padding: 10px 0 10px;
+          transition: background 0.4s;
         }
 
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
+        .sk-bg-dots {
+          position: absolute; inset: 0; pointer-events: none;
+          background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .sk-bg-hline {
+          position: absolute; left: 0; right: 0; height: 1px;
+          background: var(--border); opacity: 0.5; pointer-events: none;
+        }
+        .sk-bg-vline {
+          position: absolute; right: 34%; top: 0; bottom: 0;
+          width: 1px; background: var(--border); opacity: 0.3; pointer-events: none;
+        }
+        .sk-bg-glow {
+          position: absolute; border-radius: 50%; pointer-events: none;
+          background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+        }
+        .sk-bg-glow--1 { top: -80px;    left: -60px;   width: 440px; height: 440px; }
+        .sk-bg-glow--2 { bottom: -60px; right: -60px;  width: 340px; height: 340px; }
+
+        .sk-wrap {
+          position: relative; z-index: 10;
+          width: 100%; max-width: 1100px;
+          margin: 0 auto; padding: 0 40px;
+          opacity: 0; transform: translateY(24px);
+          transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .sk-wrap--visible { opacity: 1; transform: translateY(0); }
+
+        .sk-header { text-align: center; margin-bottom: 52px; }
+        .sk-overline {
+          display: inline-flex; align-items: center; gap: 10px;
+          font-family: 'Geist Mono', monospace;
+          font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+          color: var(--cyan-text); margin-bottom: 20px;
+        }
+        .sk-overline__dash { width: 26px; height: 1px; background: var(--cyan); opacity: 0.5; flex-shrink: 0; }
+        .sk-title {
+          font-family: 'Fraunces', serif;
+          font-size: clamp(40px, 5.5vw, 64px);
+          font-weight: 300; font-style: italic;
+          color: var(--ink); line-height: 1;
+          letter-spacing: -0.02em; margin: 0 0 16px;
+          transition: color 0.4s;
+        }
+        .sk-title--cyan { font-style: normal; font-weight: 500; color: var(--cyan); }
+        .sk-subtitle {
+          font-family: 'Fraunces', serif;
+          font-size: 14px; font-weight: 300; font-style: italic;
+          color: var(--ink-muted); max-width: 520px;
+          margin: 0 auto; line-height: 1.7;
+          transition: color 0.4s;
         }
 
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+        .sk-tabs {
+          display: flex; flex-wrap: wrap; justify-content: center;
+          gap: 8px; margin-bottom: 40px;
         }
-        
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
+        .sk-tab {
+          display: flex; align-items: center; gap: 7px;
+          padding: 9px 18px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: var(--ink-muted);
+          font-family: 'Geist', sans-serif;
+          font-size: 12px; font-weight: 500; letter-spacing: 0.02em;
+          cursor: pointer;
+          transition: all 0.2s;
+          backdrop-filter: blur(8px);
+        }
+        .sk-tab:hover { color: var(--cyan); border-color: var(--border-h); }
+        .sk-tab--active {
+          color: var(--cyan);
+          border-color: var(--cyan);
+          background: var(--cyan-dim);
+        }
+        .sk-tab__count {
+          font-family: 'Geist Mono', monospace;
+          font-size: 9px; color: var(--cyan-text);
+          background: var(--cyan-dim);
+          border: 1px solid var(--border);
+          padding: 1px 6px;
+        }
+
+        .sk-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 3fr));
+          gap: 26px;
+          background: none;
+          border: none;
+          margin-bottom: 1px;
+        }
+
+        .sk-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          display: flex; flex-direction: column;
+          overflow: hidden;
+          animation: skFadeUp 0.5s ease both;
+          transition: background 0.2s;
+          cursor: default;
+        }
+        .sk-card:hover,
+        .sk-card--hovered { background: var(--cyan-dim); border-color: var(--border-h); }
+        .sk-card:hover .sk-card__topline,
+        .sk-card--hovered .sk-card__topline { opacity: 0.65; }
+        .sk-card:hover .sk-card__name { color: var(--cyan); }
+
+        .sk-card__topline {
+          height: 2px; background: var(--cyan);
+          opacity: 0; transition: opacity 0.3s; flex-shrink: 0;
+        }
+        .sk-card__body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+        .sk-card__top {
+          display: flex; align-items: center; justify-content: space-between;
+        }
+        .sk-initial {
+          width: 38px; height: 38px;
+          display: flex; align-items: center; justify-content: center;
+          background: var(--cyan-dim);
+          border: 1px solid var(--border);
+          font-family: 'Geist Mono', monospace;
+          font-size: 11px; font-weight: 400; letter-spacing: 0.06em;
+          color: var(--cyan-text);
+          flex-shrink: 0;
+          transition: border-color 0.2s;
+        }
+        .sk-card:hover .sk-initial { border-color: var(--border-h); color: var(--cyan); }
+
+        .sk-card__level {
+          font-family: 'Fraunces', serif;
+          font-size: 28px; font-weight: 300; font-style: italic;
+          color: var(--cyan); line-height: 1;
+        }
+        .sk-card__pct {
+          font-family: 'Geist Mono', monospace;
+          font-size: 10px; color: var(--cyan-text); margin-left: 1px;
+          font-style: normal;
+        }
+
+        .sk-card__name {
+          font-family: 'Geist', sans-serif;
+          font-size: 14px; font-weight: 600;
+          color: var(--ink); margin: 0; letter-spacing: -0.01em;
+          transition: color 0.2s;
+        }
+        .sk-card__desc {
+          font-family: 'Fraunces', serif;
+          font-size: 12px; font-weight: 300; font-style: italic;
+          color: var(--ink-muted); margin: 0; line-height: 1.6;
+          transition: color 0.4s;
+        }
+
+        .sk-card__foot {
+          display: flex; align-items: center;
+          justify-content: space-between; margin-top: 4px;
+        }
+        .sk-card__prof-lbl {
+          font-family: 'Geist Mono', monospace;
+          font-size: 8px; text-transform: uppercase;
+          letter-spacing: 0.14em; color: var(--ink-muted);
+        }
+
+        .sk-dots { display: flex; gap: 4px; align-items: center; }
+        .sk-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: var(--border);
+          transition: background 0.3s;
+        }
+        .sk-dot--on { background: var(--cyan); }
+
+        .sk-bar-track {
+          width: 100%; height: 2px;
+          background: var(--border);
+          position: relative; overflow: hidden;
+        }
+        .sk-bar-fill {
+          position: absolute; left: 0; top: 0; height: 100%;
+          background: var(--cyan);
+          transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .sk-certs { margin-top: 48px; }
+        .sk-certs__label {
+          display: flex; align-items: center; gap: 10px;
+          font-family: 'Geist Mono', monospace;
+          font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+          color: var(--cyan-text); margin-bottom: 16px;
+          justify-content: center;
+        }
+        .sk-certs__list {
+          display: flex; flex-wrap: wrap;
+          justify-content: center; gap: 8px;
+        }
+        .sk-cert {
+          display: flex; align-items: center; gap: 8px;
+          padding: 10px 20px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          font-family: 'Geist', sans-serif;
+          font-size: 12px; font-weight: 500;
+          color: var(--ink-muted);
+          backdrop-filter: blur(8px);
+          transition: color 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .sk-cert svg { color: var(--cyan); flex-shrink: 0; }
+        .sk-cert:hover {
+          color: var(--ink);
+          border-color: var(--border-h);
+          background: var(--cyan-dim);
+        }
+
+        @keyframes skFadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+          .sk-wrap { padding: 0 20px; }
+          .sk-grid { grid-template-columns: 1fr 1fr; }
+          .sk-tab span:not(.sk-tab__count) { display: none; }
         }
       `}</style>
     </section>

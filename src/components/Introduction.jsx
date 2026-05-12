@@ -1,46 +1,62 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import headerimg from "../images/header-img.png";
-import { HiMail, HiSparkles } from "react-icons/hi";
+import { HiMail } from "react-icons/hi";
+
+/* ── Stagger container variants ── */
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] } },
+};
 
 const Introduction = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [showEmailButton, setShowEmailButton] = useState(false);
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 20,
-        y: (e.clientY / window.innerHeight) * 20,
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // Show email button after component mounts
-  useEffect(() => {
-    setTimeout(() => setShowEmailButton(true), 1000);
-  }, []);
-
   const [typedText, setTypedText] = useState("");
   const [currentRole, setCurrentRole] = useState(0);
 
-  const roles = [
-    "Data Scientist",
-    "Full Stack Developer",
-    "AI/ML Engineer",
-    "Cloud Architect",
-    "Problem Solver"
-  ];
+  /* Smooth magnetic mouse for portrait tilt */
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 60, damping: 18 });
+  const springY = useSpring(mouseY, { stiffness: 60, damping: 18 });
+  const rotateY = useTransform(springX, [-1, 1], [-10, 10]);
+  const rotateX = useTransform(springY, [-1, 1], [8, -8]);
 
-  // Typing animation effect
+  const sectionRef = useRef(null);
+
   useEffect(() => {
+    const handleMouseMove = (e) => {
+      const rect = sectionRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      mouseX.set(((e.clientX - rect.left) / rect.width - 0.5) * 2);
+      mouseY.set(((e.clientY - rect.top) / rect.height - 0.5) * 2);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowEmailButton(true), 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const roles = [
+      "Full Stack Developer",
+      "Data Scientist",
+      "Game Developer/Designer",
+      "AI/ML Engineer",
+      "Cloud Architect",
+    ];
     let currentText = "";
     let currentIndex = 0;
     const fullText = roles[currentRole];
-    
+
     const typingInterval = setInterval(() => {
       if (currentIndex < fullText.length) {
         currentText += fullText[currentIndex];
@@ -57,463 +73,799 @@ const Introduction = () => {
               clearInterval(deletingInterval);
               setCurrentRole((prev) => (prev + 1) % roles.length);
             }
-          }, 50);
-        }, 2000);
+          }, 40);
+        }, 2200);
       }
-    }, 100);
+    }, 85);
 
     return () => clearInterval(typingInterval);
   }, [currentRole]);
 
-  // Particle animation on canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    const particleCount = 50;
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = Math.random() * 0.5 - 0.25;
-        this.speedY = Math.random() * 0.5 - 0.25;
-        this.opacity = Math.random() * 0.5 + 0.2;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-
-      draw() {
-        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach((particle, i) => {
-        particle.update();
-        particle.draw();
-
-        particles.slice(i + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 100) {
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 * (1 - distance / 100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.stroke();
-          }
-        });
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const profile = {
     name: "Margaret Gathoni",
-    title: "Data scientist & Full Stack Developer",
+    title: "Data Scientist & Full Stack Developer",
     location: "Nairobi, Kenya",
-    tagline: "Transforming Ideas into Intelligent Solutions",
-    bio: "I architect scalable systems that bridge cutting-edge technology with real-world impact. From machine learning pipelines to full-stack applications, I turn complex problems into elegant solutions.",
+    bio: "Started with data, got pulled into software, then couldn't stop wondering what was powering the games I kept playing. Now I build it all: the data pipelines, the software, the game systems, the backend that makes everything feel effortless from the outside.",
     experience: "6+",
-    projects: "50+",
-    clients: "10+",
     email: "mgathoni.gathoni9@gmail.com",
-    focus: [
-      "Full Stack Development",
-      "Data Science & ML",
-      "Cloud Architecture",
-      "AI Systems"
-    ],
-    technologies: ["Python", "Flask", "FastAPI", "Django", "React", "TypeScript", "AWS", "PostgreSQL", "TensorFlow"],
+    technologies: ["Python", "React", "TypeScript", "AWS", "Databases"],
     avatar_url: headerimg,
   };
 
-  const stats = [
-    { label: "Years Experience", value: profile.experience, icon: "⚡" },
-    { label: "Projects Delivered", value: profile.projects, icon: "🚀" },
-    { label: "Happy Clients", value: profile.clients, icon: "🎯" },
+  const socials = [
+    { href: "https://linkedin.com/in/margaret-gathoni", label: "LinkedIn", d: "M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" },
+    { href: "https://github.com/dynasty-29", label: "GitHub", d: "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" },
+    { href: "https://youtube.com/@SonnieCodes", label: "YouTube", d: "M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" },
+    { href: "https://medium.com/@SonnieCodes", label: "Medium", d: "M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" },
   ];
 
   const scrollToProjects = () => {
-    const projectsSection = document.getElementById('section-3');
-    if (projectsSection) {
-      projectsSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById("section-3")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Email handler - FIXED VERSION
   const handleEmailClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const email = profile.email;
-    const subject = "Let's Work Together!";
-    const body = `Hi Margaret,
-
-I came across your portfolio and I'm impressed by your work. I'd love to discuss potential opportunities.
-
-Best regards,`;
-    
-    // Create mailto link
-    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    // Log for debugging
-    console.log("Opening email with:", mailtoLink);
-    
-    // Open email client
-    window.location.href = mailtoLink;
+    const subject = "Let's Work Together";
+    const body = `Hi Margaret,\n\nI came across your portfolio and I'm impressed by your work. I'd love to discuss potential opportunities.\n\nBest regards,`;
+    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
-      {/* Animated Canvas Background */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 opacity-40"
-        aria-hidden="true"
-      />
+    <section ref={sectionRef} className="hero">
 
-      {/* Gradient Orbs */}
-      <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-indigo-500/30 to-purple-500/30 rounded-full blur-3xl animate-pulse"
-        style={{
-          transform: `translate(${mousePosition.x * 2}px, ${mousePosition.y * 2}px)`,
-          transition: 'transform 0.5s ease-out',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full blur-3xl animate-pulse"
-        style={{
-          transform: `translate(-${mousePosition.x * 2}px, -${mousePosition.y * 2}px)`,
-          transition: 'transform 0.5s ease-out',
-          animationDelay: '1s'
-        }}
-        aria-hidden="true"
-      />
+      {/* ── Ambient background ── */}
+      <div className="hero__bg-dots" aria-hidden="true" />
+      <div className="hero__bg-grid" aria-hidden="true" />
 
-      {/* Floating Email Button - FIXED */}
-      <button
+      {/* Glows */}
+      <div className="hero__glow hero__glow--tr" aria-hidden="true" />
+      <div className="hero__glow hero__glow--bl" aria-hidden="true" />
+      <div className="hero__glow hero__glow--center" aria-hidden="true" />
+
+      {/* Horizontal rules */}
+      <div className="hero__rule hero__rule--top" aria-hidden="true" />
+      <div className="hero__rule hero__rule--bottom" aria-hidden="true" />
+
+      {/* ── Contact pill (fixed) ── */}
+      <motion.button
         onClick={handleEmailClick}
-        className={`fixed top-24 right-8 z-50 group transition-all duration-500 ${
-          showEmailButton ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-        }`}
+        initial={{ opacity: 0, y: -12 }}
+        animate={showEmailButton ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="contact-pill"
+        aria-label="Send email"
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
       >
-        {/* Glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-        
-        {/* Button */}
-        <div className="relative bg-gradient-to-r from-cyan-600 to-purple-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/20 backdrop-blur-sm hover:scale-105 transition-transform cursor-pointer">
-          {/* Icon with animation */}
-          <div className="relative">
-            <HiMail className="text-2xl group-hover:scale-110 transition-transform" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-          </div>
-          
-          {/* Text */}
-          <div className="flex flex-col items-start">
-            <span className="text-xs font-semibold uppercase tracking-wider opacity-90">Available for Work</span>
-            <span className="text-sm font-bold">Get In Touch!</span>
-          </div>
+        <span className="contact-pill__dot" aria-hidden="true" />
+        <HiMail size={13} />
+        <span>Available — Let's talk</span>
+      </motion.button>
 
-          {/* Sparkle effect */}
-          <HiSparkles className="text-yellow-300 animate-pulse" />
-        </div>
+      {/* ── MAIN LAYOUT ── */}
+      <div className="hero__layout">
 
-        {/* Hover tooltip */}
-        <div className="absolute top-full mt-2 right-0 px-4 py-2 bg-slate-900/95 backdrop-blur-sm border border-white/10 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-          Click to send me an email 📧
-          <div className="absolute bottom-full right-8 w-2 h-2 bg-slate-900 border-l border-t border-white/10 rotate-45 -mb-1"></div>
-        </div>
-      </button>
+        {/* ── LEFT: giant background name + content ── */}
+        <div className="hero__left">
 
-      {/* Main Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Left: Content */}
-          <div className="space-y-8 order-2 lg:order-1">
-            {/* Status Badge */}
-            <div className="flex flex-wrap gap-3 animate-fade-in">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm px-4 py-2 rounded-full border border-green-500/50 shadow-lg shadow-green-500/20">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                <span className="text-sm font-semibold text-green-300">Available for Projects</span>
+          {/* Watermark name behind everything */}
+          <motion.div
+            className="hero__watermark"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
+            aria-hidden="true"
+          >
+            Margaret
+          </motion.div>
+
+          {/* Foreground content */}
+          <motion.div
+            className="hero__content"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div className="hero__overline" variants={itemVariants}>
+              <span className="hero__overline-dash" aria-hidden="true" />
+              <span>{profile.location}</span>
+              <span className="hero__overline-sep" aria-hidden="true">·</span>
+              <span className="hero__overline-status">
+                <span className="hero__status-dot" aria-hidden="true" />
+                Available
+              </span>
+            </motion.div>
+
+            <motion.h1 className="hero__name" variants={itemVariants}>
+              <span className="hero__name-first">Margaret</span>
+              <span className="hero__name-last">Gathoni</span>
+            </motion.h1>
+
+            <motion.div className="hero__role" variants={itemVariants} aria-live="polite">
+              <span className="hero__role-slash">./</span>
+              <span className="hero__role-text">{typedText}</span>
+              <span className="hero__role-cursor" aria-hidden="true" />
+            </motion.div>
+
+            <motion.div className="hero__divider" variants={itemVariants} aria-hidden="true" />
+
+            <motion.p className="hero__bio" variants={itemVariants}>
+              {profile.bio}
+            </motion.p>
+
+            {/* Stats row */}
+            <motion.div className="hero__stats" variants={itemVariants}>
+              <div className="hero__stat">
+                <span className="hero__stat-val">6+</span>
+                <span className="hero__stat-lbl">Years Exp.</span>
               </div>
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-                <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span className="text-sm font-medium text-gray-300">{profile.location}</span>
+              <div className="hero__stat-sep" aria-hidden="true" />
+              <div className="hero__stat">
+                <span className="hero__stat-val">20+</span>
+                <span className="hero__stat-lbl">Projects</span>
               </div>
-            </div>
-
-            {/* Name & Title */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                  <span className="block text-white mb-2">Hi, I'm</span>
-                  <span className="block bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-gradient">
-                    {profile.name}
-                  </span>
-                </h1>
-                
-                {/* Typing animation */}
-                <div className="flex items-center gap-2 text-2xl md:text-3xl text-cyan-400 font-light h-12">
-                  <span className="text-white/60">→</span>
-                  <span className="font-mono">{typedText}</span>
-                  <span className="w-0.5 h-8 bg-cyan-400 animate-blink"></span>
-                </div>
+              <div className="hero__stat-sep" aria-hidden="true" />
+              <div className="hero__stat">
+                <span className="hero__stat-val">3</span>
+                <span className="hero__stat-lbl">Domains</span>
               </div>
+            </motion.div>
 
-              {/* Tagline */}
-              <p className="text-xl md:text-2xl text-gray-300 font-light max-w-xl leading-relaxed">
-                {profile.tagline}
-              </p>
-
-              {/* Bio */}
-              <div className="relative pl-6 border-l-2 border-cyan-500/50">
-                <p className="text-base md:text-lg text-gray-400 leading-relaxed">
-                  {profile.bio}
-                </p>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="relative group"
-                  style={{ animationDelay: `${index * 100}ms` }}
+            {/* Tech tags */}
+            <motion.div className="hero__stack" variants={itemVariants}>
+              {profile.technologies.map((tech, i) => (
+                <motion.span
+                  key={i}
+                  className="hero__tag"
+                  whileHover={{ y: -2, borderColor: "var(--cyan)" }}
+                  transition={{ duration: 0.15 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
-                  <div className="relative bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1">
-                    <div className="text-3xl mb-2">{stat.icon}</div>
-                    <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                      {stat.value}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-400 mt-1">
-                      {stat.label}
-                    </div>
-                  </div>
-                </div>
+                  {tech}
+                </motion.span>
               ))}
-            </div>
+            </motion.div>
 
-            {/* Tech Stack */}
-            <div className="space-y-3">
-              <p className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Tech Stack</p>
-              <div className="flex flex-wrap gap-2">
-                {profile.technologies.map((tech, index) => (
-                  <span
-                    key={index}
-                    className="group relative px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-cyan-500/50 text-gray-300 text-sm font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button
+            {/* CTA buttons */}
+            <motion.div className="hero__actions" variants={itemVariants}>
+              <motion.button
                 onClick={scrollToProjects}
-                className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/70 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                className="hero__btn hero__btn--primary"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.97 }}
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  View My Work
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </button>
-              
-              <a
+                View Work
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </motion.button>
+              <motion.a
                 href="/Resume.pdf"
                 download
-                className="group px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:border-cyan-500 text-white font-semibold rounded-xl hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2"
+                className="hero__btn hero__btn--ghost"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.97 }}
               >
                 Download CV
-                <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-              </a>
-            </div>
+              </motion.a>
+            </motion.div>
 
-            {/* Social Links */}
-            <div className="flex gap-3 pt-2">
-              {[
-                { href: "https://linkedin.com/in/margaret-gathoni", label: "LinkedIn", path: "M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" },
-                { href: "https://github.com/dynasty-29", label: "GitHub", path: "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" },
-                { href: "https://youtube.com/@SonnieCodes", label: "YouTube", path: "M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" },
-                { href: "https://medium.com/@SonnieCodes", label: "Medium", path: "M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" }
-              ].map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
+            {/* Socials */}
+            <motion.div className="hero__socials" variants={itemVariants}>
+              {socials.map((s, i) => (
+                <motion.a
+                  key={i}
+                  href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-cyan-500/50 flex items-center justify-center hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 group"
-                  aria-label={social.label}
+                  className="hero__social"
+                  aria-label={s.label}
+                  whileHover={{ y: -3, color: "var(--cyan)", borderColor: "var(--border-h)" }}
+                  transition={{ duration: 0.15 }}
                 >
-                  <svg className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                    <path d={social.path} />
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                    <path d={s.d} />
                   </svg>
-                </a>
+                </motion.a>
               ))}
-            </div>
-          </div>
-
-          {/* Right: Image */}
-          <div className="flex justify-center order-1 lg:order-2">
-            <div className="relative group">
-              {/* Glowing ring */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 rounded-full opacity-75 group-hover:opacity-100 blur-2xl transition duration-500 animate-spin-slow"></div>
-              
-              {/* Image container with glass effect */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-3xl backdrop-blur-sm"></div>
-                <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md p-2 rounded-3xl border border-white/20 shadow-2xl">
-                  <img
-                    src={profile.avatar_url}
-                    alt={`${profile.name} - ${profile.title}`}
-                    className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-2xl"
-                    style={{
-                      transform: `perspective(1000px) rotateY(${mousePosition.x * 0.5}deg) rotateX(${-mousePosition.y * 0.5}deg)`,
-                      transition: 'transform 0.3s ease-out',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Floating elements */}
-              <div className="absolute -top-6 -right-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-full shadow-xl font-semibold text-sm animate-float border border-white/20 backdrop-blur-sm">
-                🚀 Let's Build
-              </div>
-
-              <div className="absolute -bottom-6 -left-6 bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-full shadow-xl font-semibold text-sm animate-float-delayed border border-white/20 backdrop-blur-sm">
-                💡 Innovative
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -top-10 -left-10 w-20 h-20 border-2 border-cyan-500/30 rounded-full animate-ping-slow"></div>
-              <div className="absolute -bottom-8 -right-8 w-16 h-16 bg-purple-500/20 rounded-lg rotate-12 backdrop-blur-sm"></div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1.5 h-3 bg-cyan-400 rounded-full mt-2 animate-scroll"></div>
-          </div>
+        {/* ── RIGHT: portrait ── */}
+        <div className="hero__right">
+
+          {/* Decorative rings behind the image */}
+          <motion.div
+            className="hero__ring hero__ring--1"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.1, delay: 0.3, ease: "easeOut" }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="hero__ring hero__ring--2"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.1, delay: 0.45, ease: "easeOut" }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="hero__ring hero__ring--3"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.1, delay: 0.6, ease: "easeOut" }}
+            aria-hidden="true"
+          />
+
+          {/* Portrait frame with 3D tilt */}
+          <motion.div
+            className="hero__portrait-wrap"
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+            style={{ rotateY, rotateX, transformPerspective: 1000 }}
+          >
+            {/* Corner brackets */}
+            <span className="hero__corner hero__corner--tl" aria-hidden="true" />
+            <span className="hero__corner hero__corner--tr" aria-hidden="true" />
+            <span className="hero__corner hero__corner--bl" aria-hidden="true" />
+            <span className="hero__corner hero__corner--br" aria-hidden="true" />
+
+            {/* The image — pushed visually "back" by the overlays on top */}
+            <img
+              src={profile.avatar_url}
+              alt={`${profile.name} — ${profile.title}`}
+              className="hero__portrait-img"
+            />
+
+            {/* Overlay layers that sit in FRONT of the image to push it back */}
+            <div className="hero__portrait-overlay hero__portrait-overlay--vignette" aria-hidden="true" />
+            <div className="hero__portrait-overlay hero__portrait-overlay--scanlines" aria-hidden="true" />
+            <div className="hero__portrait-overlay hero__portrait-overlay--tint" aria-hidden="true" />
+
+            {/* Index badge */}
+            <span className="hero__portrait-index" aria-hidden="true">01 / PROFILE</span>
+          </motion.div>
+
+          {/* Floating credential card */}
+          <motion.div
+            className="hero__credential"
+            initial={{ opacity: 0, x: 30, y: 10 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85, ease: "easeOut" }}
+            whileHover={{ y: -3 }}
+          >
+            <span className="hero__credential-dot" aria-hidden="true" />
+            <div>
+              <p className="hero__credential-title">Open to work</p>
+              <p className="hero__credential-sub">Full-time · Contract · Freelance</p>
+            </div>
+          </motion.div>
+
+          {/* Floating exp badge */}
+          <motion.div
+            className="hero__exp-badge"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 1.0, ease: "easeOut" }}
+            whileHover={{ y: -3 }}
+          >
+            <span className="hero__exp-val">6+</span>
+            <span className="hero__exp-lbl">Years</span>
+          </motion.div>
         </div>
       </div>
 
+      {/* ── Scroll hint ── */}
+      <motion.div
+        className="hero__scroll"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4, duration: 0.6 }}
+        aria-hidden="true"
+      >
+        <div className="hero__scroll-track">
+          <div className="hero__scroll-thumb" />
+        </div>
+      </motion.div>
+
       <style>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@300;400&display=swap');
+
+        /* ── Tokens ── */
+        :root {
+          --bg:        #060e12;
+          --surface:   rgba(13,30,38,0.82);
+          --surface2:  rgba(13,30,38,0.5);
+          --border:    rgba(34,211,238,0.13);
+          --border-h:  rgba(34,211,238,0.38);
+          --ink:       #e8f6fa;
+          --ink-muted: rgba(200,235,245,0.42);
+          --cyan:      #22d3ee;
+          --cyan2:     #06b6d4;
+          --cyan-dim:  rgba(34,211,238,0.08);
+          --cyan-text: rgba(34,211,238,0.58);
+          --dot:       rgba(34,211,238,0.1);
+          --glow:      rgba(34,211,238,0.06);
+          --sep:       rgba(34,211,238,0.16);
+          --ring:      rgba(34,211,238,0.07);
         }
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s linear infinite;
+
+        /* ── Section ── */
+        .hero {
+          position: relative;
+          min-height: 100vh;
+          width: 100%;
+          background: var(--bg);
+          font-family: 'Geist', sans-serif;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
         }
-        
+
+        /* ── Background ── */
+        .hero__bg-dots {
+          position: absolute; inset: 0; pointer-events: none; z-index: 0;
+          background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+          background-size: 28px 28px;
+        }
+        .hero__bg-grid {
+          position: absolute; inset: 0; pointer-events: none; z-index: 0;
+          background-image:
+            linear-gradient(var(--border) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border) 1px, transparent 1px);
+          background-size: 120px 120px;
+          opacity: 0.25;
+          mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+        }
+        .hero__glow {
+          position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+          background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+        }
+        .hero__glow--tr  { top: -120px; right: -80px;  width: 600px; height: 600px; background: radial-gradient(circle, rgba(34,211,238,0.09) 0%, transparent 65%); }
+        .hero__glow--bl  { bottom: -100px; left: -60px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 65%); }
+        .hero__glow--center { top: 30%; left: 45%; width: 700px; height: 700px; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(34,211,238,0.03) 0%, transparent 60%); }
+
+        .hero__rule {
+          position: absolute; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
+          pointer-events: none; z-index: 0;
+        }
+        .hero__rule--top    { top: 10%; }
+        .hero__rule--bottom { bottom: 10%; }
+
+        /* ── Contact pill ── */
+        .contact-pill {
+          position: fixed; top: 22px; right: 24px; z-index: 200;
+          display: flex; align-items: center; gap: 8px;
+          padding: 8px 16px;
+          background: rgba(13,30,38,0.9);
+          border: 1px solid var(--border);
+          border-radius: 100px;
+          color: var(--ink-muted);
+          font-family: 'Geist Mono', monospace;
+          font-size: 10px; font-weight: 400; letter-spacing: 0.08em;
+          cursor: pointer;
+          backdrop-filter: blur(12px);
+        }
+        .contact-pill__dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #4ade80; flex-shrink: 0;
+          box-shadow: 0 0 7px rgba(74,222,128,0.6);
+          animation: pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 7px rgba(74,222,128,0.6); }
+          50%       { box-shadow: 0 0 14px rgba(74,222,128,0.9); }
+        }
+
+        /* ── Layout ── */
+        .hero__layout {
+          position: relative; z-index: 10;
+          width: 100%; max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 64px;
+          display: grid;
+          grid-template-columns: 1fr 480px;
+          gap: 0;
+          align-items: center;
+          min-height: 100vh;
+        }
+
+        /* ── LEFT ── */
+        .hero__left {
+          position: relative;
+          padding: 100px 0 100px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        /* Watermark */
+        .hero__watermark {
+          position: absolute;
+          top: 50%; left: -20px;
+          transform: translateY(-50%);
+          font-family: 'Fraunces', serif;
+          font-size: clamp(100px, 14vw, 180px);
+          font-weight: 300; font-style: italic;
+          color: transparent;
+          -webkit-text-stroke: 1px rgba(34,211,238,0.07);
+          white-space: nowrap;
+          pointer-events: none;
+          user-select: none;
+          line-height: 1;
+          z-index: 0;
+        }
+
+        .hero__content {
+          position: relative; z-index: 2;
+          display: flex; flex-direction: column; gap: 24px;
+          max-width: 580px;
+        }
+
+        /* Overline */
+        .hero__overline {
+          display: flex; align-items: center; gap: 10px;
+          font-family: 'Geist Mono', monospace;
+          font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+          color: var(--cyan-text);
+        }
+        .hero__overline-dash {
+          display: inline-block; width: 28px; height: 1px;
+          background: var(--cyan); opacity: 0.5;
+        }
+        .hero__overline-sep { opacity: 0.3; }
+        .hero__overline-status {
+          display: flex; align-items: center; gap: 6px;
+        }
+        .hero__status-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: #4ade80;
+          box-shadow: 0 0 6px rgba(74,222,128,0.7);
+        }
+
+        /* Name */
+        .hero__name {
+          display: flex; flex-direction: column;
+          margin: 0; line-height: 0.9;
+          gap: 4px;
+        }
+        .hero__name-first {
+          font-family: 'Fraunces', serif;
+          font-size: clamp(52px, 6.5vw, 80px);
+          font-weight: 300; font-style: italic;
+          color: var(--ink);
+          letter-spacing: -0.02em;
+        }
+        .hero__name-last {
+          font-family: 'Fraunces', serif;
+          font-size: clamp(44px, 5.5vw, 68px);
+          font-weight: 500; font-style: normal;
+          color: var(--cyan);
+          letter-spacing: -0.02em;
+        }
+
+        /* Role */
+        .hero__role {
+          display: flex; align-items: center;
+          font-family: 'Geist Mono', monospace;
+          font-size: 12px; letter-spacing: 0.06em;
+          color: var(--ink-muted);
+          height: 24px;
+        }
+        .hero__role-slash { color: var(--cyan); margin-right: 5px; opacity: 0.7; }
+        .hero__role-text  { color: var(--cyan); }
+        .hero__role-cursor {
+          display: inline-block; width: 7px; height: 14px;
+          background: var(--cyan); margin-left: 3px; vertical-align: middle;
+          animation: blink 1.1s step-end infinite;
+        }
+
+        /* Divider */
+        .hero__divider {
+          width: 100%; height: 1px;
+          background: linear-gradient(90deg, var(--cyan) 0%, var(--sep) 40%, transparent 100%);
+          opacity: 0.4;
+        }
+
+        /* Bio */
+        .hero__bio {
+          font-family: 'Fraunces', serif;
+          font-size: 14px; font-weight: 300; font-style: italic;
+          line-height: 1.9; color: var(--ink-muted); margin: 0;
+          padding-left: 20px;
+          border-left: 2px solid var(--sep);
+          position: relative;
+          max-width: 480px;
+        }
+        .hero__bio::before {
+          content: ''; position: absolute;
+          left: -1px; top: 0; width: 2px; height: 44px;
+          background: var(--cyan); opacity: 0.65;
+        }
+
+        /* Stats */
+        .hero__stats {
+          display: flex; align-items: center; gap: 0;
+          border: 1px solid var(--border);
+          background: var(--surface);
+          backdrop-filter: blur(8px);
+          overflow: hidden;
+          width: fit-content;
+        }
+        .hero__stat {
+          display: flex; flex-direction: column; align-items: center;
+          padding: 14px 28px; gap: 4px;
+          transition: background 0.2s;
+        }
+        .hero__stat:hover { background: var(--cyan-dim); }
+        .hero__stat-val {
+          font-family: 'Fraunces', serif;
+          font-size: 28px; font-weight: 300; font-style: italic;
+          color: var(--cyan); line-height: 1;
+        }
+        .hero__stat-lbl {
+          font-family: 'Geist Mono', monospace;
+          font-size: 8px; text-transform: uppercase;
+          letter-spacing: 0.14em; color: var(--ink-muted);
+        }
+        .hero__stat-sep {
+          width: 1px; height: 44px;
+          background: var(--border); flex-shrink: 0;
+        }
+
+        /* Tags */
+        .hero__stack { display: flex; flex-wrap: wrap; gap: 6px; }
+        .hero__tag {
+          padding: 4px 11px;
+          background: var(--cyan-dim);
+          border: 1px solid var(--border);
+          font-family: 'Geist Mono', monospace;
+          font-size: 9px; color: var(--cyan-text);
+          letter-spacing: 0.06em;
+          cursor: default;
+        }
+
+        /* Buttons */
+        .hero__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .hero__btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 12px 24px;
+          font-family: 'Geist', sans-serif;
+          font-size: 11px; font-weight: 600;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          cursor: pointer; text-decoration: none; border: none;
+          transition: all 0.2s;
+        }
+        .hero__btn--primary { background: var(--cyan); color: var(--bg); }
+        .hero__btn--primary:hover { background: var(--cyan2); }
+        .hero__btn--ghost {
+          background: transparent; color: var(--cyan);
+          border: 1px solid var(--border);
+        }
+        .hero__btn--ghost:hover { border-color: var(--border-h); }
+
+        /* Socials */
+        .hero__socials { display: flex; gap: 7px; }
+        .hero__social {
+          width: 34px; height: 34px;
+          display: flex; align-items: center; justify-content: center;
+          background: var(--cyan-dim);
+          border: 1px solid var(--border);
+          color: var(--cyan-text); text-decoration: none;
+        }
+
+        /* ── RIGHT ── */
+        .hero__right {
+          position: relative;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* Rings */
+        .hero__ring {
+          position: absolute; border-radius: 50%;
+          border: 1px solid var(--ring);
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+        }
+        .hero__ring--1 { width: 340px; height: 340px; border-color: rgba(34,211,238,0.12); }
+        .hero__ring--2 { width: 460px; height: 460px; border-color: rgba(34,211,238,0.07); }
+        .hero__ring--3 { width: 580px; height: 580px; border-color: rgba(34,211,238,0.04); }
+
+        /* Portrait */
+        .hero__portrait-wrap {
+          position: relative;
+          width: 340px; height: 440px;
+          transform-style: preserve-3d;
+          will-change: transform;
+        }
+        .hero__portrait-img {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          object-fit: cover;
+          object-position: center top;
+          display: block;
+          /* Desaturated + dim to push it "behind" the overlays */
+          filter: grayscale(25%) saturate(0.75) brightness(0.78) contrast(1.08);
+          transition: filter 0.5s;
+          z-index: 0;
+        }
+        .hero__portrait-wrap:hover .hero__portrait-img {
+          filter: grayscale(0%) saturate(1) brightness(0.88) contrast(1.05);
+        }
+
+        /* Overlays sit IN FRONT of the image, pushing it visually backward */
+        .hero__portrait-overlay {
+          position: absolute; inset: 0; pointer-events: none;
+        }
+        .hero__portrait-overlay--vignette {
+          background: radial-gradient(ellipse at center, transparent 40%, rgba(6,14,18,0.7) 100%);
+          z-index: 1;
+        }
+        .hero__portrait-overlay--scanlines {
+          background-image: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0,0,0,0.06) 2px,
+            rgba(0,0,0,0.06) 4px
+          );
+          z-index: 2;
+        }
+        .hero__portrait-overlay--tint {
+          background: linear-gradient(
+            135deg,
+            rgba(34,211,238,0.12) 0%,
+            transparent 50%,
+            rgba(6,14,18,0.45) 100%
+          );
+          z-index: 3;
+          mix-blend-mode: color-dodge;
+        }
+
+        /* Corner brackets */
+        .hero__corner {
+          position: absolute; width: 22px; height: 22px;
+          z-index: 10; pointer-events: none;
+          opacity: 0.6;
+        }
+        .hero__corner--tl { top: -6px; left: -6px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+        .hero__corner--tr { top: -6px; right: -6px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+        .hero__corner--bl { bottom: -6px; left: -6px; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+        .hero__corner--br { bottom: -6px; right: -6px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+
+        /* Index badge */
+        .hero__portrait-index {
+          position: absolute; top: 12px; right: -1px; z-index: 10;
+          font-family: 'Geist Mono', monospace;
+          font-size: 7px; letter-spacing: 0.18em; text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+          background: rgba(34,211,238,0.15);
+          border: 1px solid rgba(34,211,238,0.2);
+          padding: 3px 8px;
+          backdrop-filter: blur(6px);
+        }
+
+        /* Credential card */
+        .hero__credential {
+          position: absolute;
+          bottom: calc(50% - 240px);
+          right: -20px;
+          display: flex; align-items: center; gap: 10px;
+          padding: 12px 16px;
+          background: rgba(13,30,38,0.92);
+          border: 1px solid var(--border);
+          backdrop-filter: blur(12px);
+          min-width: 220px;
+          cursor: default;
+        }
+        .hero__credential-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #22c55e; flex-shrink: 0;
+          box-shadow: 0 0 8px rgba(34,197,94,0.6);
+        }
+        .hero__credential-title {
+          margin: 0; font-size: 11px; font-weight: 600;
+          color: var(--ink); font-family: 'Geist', sans-serif;
+          letter-spacing: 0.04em;
+        }
+        .hero__credential-sub {
+          margin: 2px 0 0; font-size: 9px;
+          color: var(--ink-muted); letter-spacing: 0.06em;
+          font-family: 'Geist Mono', monospace;
+        }
+
+        /* Exp badge */
+        .hero__exp-badge {
+          position: absolute;
+          top: calc(50% - 230px);
+          left: -28px;
+          display: flex; flex-direction: column; align-items: center;
+          padding: 14px 18px;
+          background: var(--cyan);
+          cursor: default;
+        }
+        .hero__exp-val {
+          font-family: 'Fraunces', serif;
+          font-size: 26px; font-weight: 300; font-style: italic;
+          color: var(--bg); line-height: 1;
+        }
+        .hero__exp-lbl {
+          font-family: 'Geist Mono', monospace;
+          font-size: 7px; text-transform: uppercase;
+          letter-spacing: 0.14em; color: rgba(6,14,18,0.7);
+          margin-top: 3px;
+        }
+
+        /* Scroll hint */
+        .hero__scroll {
+          position: absolute; bottom: 28px; left: 50%;
+          transform: translateX(-50%);
+          display: flex; flex-direction: column; align-items: center;
+          z-index: 10;
+        }
+        .hero__scroll-track {
+          width: 1px; height: 48px;
+          background: var(--border); position: relative; overflow: hidden;
+        }
+        .hero__scroll-thumb {
+          width: 1px; height: 14px;
+          background: var(--cyan); opacity: 0.7;
+          position: absolute; top: 0;
+          animation: scrollThumb 2.2s ease-in-out infinite;
+        }
+
+        /* ── Animations ── */
         @keyframes blink {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
+          50%       { opacity: 0; }
         }
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        .animate-float-delayed {
-          animation: float 3s ease-in-out infinite 1.5s;
+        @keyframes scrollThumb {
+          0%   { top: -14px; opacity: 0; }
+          20%  { opacity: 0.7; }
+          80%  { opacity: 0.7; }
+          100% { top: 48px; opacity: 0; }
         }
 
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+          .hero__layout {
+            grid-template-columns: 1fr 400px;
+            padding: 0 40px;
+            gap: 0;
+          }
         }
-        .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
+        @media (max-width: 860px) {
+          .hero__layout {
+            grid-template-columns: 1fr;
+            padding: 100px 28px 60px;
+            min-height: auto;
+            gap: 48px;
+          }
+          .hero__left { padding: 0; }
+          .hero__right {
+            height: 420px;
+            order: -1;
+          }
+          .hero__watermark { font-size: 80px; }
+          .hero__credential { right: 0; bottom: 16px; }
+          .hero__exp-badge  { left: 0; top: 16px; }
         }
-
-        @keyframes ping-slow {
-          0% { transform: scale(1); opacity: 1; }
-          75%, 100% { transform: scale(2); opacity: 0; }
-        }
-        .animate-ping-slow {
-          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-
-        @keyframes scroll {
-          0% { transform: translateY(0); opacity: 0; }
-          40% { opacity: 1; }
-          100% { transform: translateY(20px); opacity: 0; }
-        }
-        .animate-scroll {
-          animation: scroll 2s ease-in-out infinite;
-        }
-
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
+        @media (max-width: 480px) {
+          .hero__layout { padding: 80px 20px 40px; }
+          .hero__right  { height: 340px; }
+          .hero__portrait-wrap { width: 260px; height: 340px; }
+          .hero__actions { flex-direction: column; }
+          .hero__btn { justify-content: center; }
         }
       `}</style>
     </section>
